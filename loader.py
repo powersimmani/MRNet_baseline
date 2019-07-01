@@ -1,5 +1,5 @@
 import numpy as np
-import os
+import os,code
 import pickle
 import torch
 import torch.nn.functional as F
@@ -19,7 +19,6 @@ class Dataset(data.Dataset):
 
         label_dict = {}
         self.paths = []
-
         for i, line in enumerate(open('metadata.csv').readlines()):
             if i == 0:
                 continue
@@ -75,7 +74,7 @@ def load_data(diagnosis, use_gpu=False):
     train_dirs = ['vol08','vol04','vol03','vol09','vol06','vol07']
     valid_dirs = ['vol10','vol05']
     test_dirs = ['vol01','vol02']
-    
+       
     train_dataset = Dataset(train_dirs, diagnosis, use_gpu)
     valid_dataset = Dataset(valid_dirs, diagnosis, use_gpu)
     test_dataset = Dataset(test_dirs, diagnosis, use_gpu)

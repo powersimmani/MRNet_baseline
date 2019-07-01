@@ -11,6 +11,9 @@ from sklearn import metrics
 from evaluate import run_model
 from loader import load_data
 from model import MRNet
+import code
+
+
 
 def train(rundir, diagnosis, epochs, learning_rate, use_gpu):
     train_loader, valid_loader, test_loader = load_data(diagnosis, use_gpu)
