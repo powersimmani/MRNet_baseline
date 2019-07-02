@@ -27,7 +27,7 @@ class Dataset(data.Dataset):
             label = line[2]
 
             #label_dict[path] = int(int(label) > diagnosis) for binary classification
-            label_map = {0:0,1:1,2:2,3:2,4:2,5:2,6:2,99:2}
+            label_map = {0:0,1:0,2:1,3:2,4:2,5:2,6:2,99:2}
             label_dict[path] = label_map[int(label)]
 
         for dir in datadirs:

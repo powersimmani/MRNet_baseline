@@ -10,7 +10,7 @@ from sklearn.metrics import auc as metric_auc
 from torch.autograd import Variable
 from sklearn.preprocessing import label_binarize
 from loader import load_data
-from model import MRNet
+from model import MRNet, MRNet_multi
 
 def get_parser():
     parser = argparse.ArgumentParser()
@@ -115,7 +115,8 @@ def run_model(model, loader, train=False, optimizer=None):
 def evaluate(split, model_path, diagnosis, use_gpu):
     train_loader, valid_loader, test_loader = load_data(diagnosis, use_gpu)
 
-    model = MRNet()
+    #model = MRNet()#for binary classification
+    model = MRNet_multi()
     state_dict = torch.load(model_path, map_location=(None if use_gpu else 'cpu'))
     model.load_state_dict(state_dict)
 
@@ -133,8 +134,13 @@ def evaluate(split, model_path, diagnosis, use_gpu):
 
     loss, auc, preds, labels = run_model(model, loader)
 
-    print(f'{split} loss: {loss:0.4f}')
-    print(f'{split} AUC: {auc:0.4f}')
+    print(split,"loss: ",loss)
+    print(split,"AUC 0:", auc[0])
+    print(split,"AUC 1:", auc[1])
+    print(split,"AUC 2:", auc[2])
+    print(split,"AUC macro:", auc['macro'])
+    print(split,"AUC micro:", auc['micro'])
+
 
     return preds, labels
 
