@@ -10,7 +10,7 @@ from sklearn import metrics
 
 from evaluate import run_model
 from loader import load_data
-from model import MRNet
+from model import MRNet,MRNet_multi
 import code
 
 
@@ -18,8 +18,8 @@ import code
 def train(rundir, diagnosis, epochs, learning_rate, use_gpu):
     train_loader, valid_loader, test_loader = load_data(diagnosis, use_gpu)
     
-    model = MRNet()
-    
+    #model = MRNet()#for binary classification
+    model = MRNet_multi()
     if use_gpu:
         model = model.cuda()
 
@@ -33,7 +33,8 @@ def train(rundir, diagnosis, epochs, learning_rate, use_gpu):
     for epoch in range(epochs):
         change = datetime.now() - start_time
         print('starting epoch {}. time passed: {}'.format(epoch+1, str(change)))
-        
+       
+        """for binary classification 
         train_loss, train_auc, _, _ = run_model(model, train_loader, train=True, optimizer=optimizer)
         print(f'train loss: {train_loss:0.4f}')
         print(f'train AUC: {train_auc:0.4f}')
@@ -41,7 +42,23 @@ def train(rundir, diagnosis, epochs, learning_rate, use_gpu):
         val_loss, val_auc, _, _ = run_model(model, valid_loader)
         print(f'valid loss: {val_loss:0.4f}')
         print(f'valid AUC: {val_auc:0.4f}')
+        """
+        train_loss, train_auc, _, _ = run_model(model, train_loader, train=True, optimizer=optimizer)
+        print("train loss::",train_loss)
+        print("train AUC 0:", train_auc[0])
+        print("train AUC 1:", train_auc[1])
+        print("train AUC 2:", train_auc[2])
+        print("train AUC macro:", train_auc['macro'])
+        print("train AUC micro:", train_auc['micro'])
 
+
+        val_loss, val_auc, _, _ = run_model(model, valid_loader)
+        print("valid loss: ",val_loss)
+        print("valid AUC 0:", val_auc[0])
+        print("valid AUC 1:", val_auc[1])
+        print("valid AUC 2:", val_auc[2])
+        print("valid AUC macro:", val_auc['macro'])
+        print("valid AUC micro:", val_auc['micro'])
         scheduler.step(val_loss)
 
         if val_loss < best_val_loss:

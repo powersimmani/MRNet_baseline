@@ -25,7 +25,10 @@ class Dataset(data.Dataset):
             line = line.strip().split(',')
             path = line[10]
             label = line[2]
-            label_dict[path] = int(int(label) > diagnosis)
+
+            #label_dict[path] = int(int(label) > diagnosis) for binary classification
+            label_map = {0:0,1:1,2:2,3:2,4:2,5:2,6:2,99:2}
+            label_dict[path] = label_map[int(label)]
 
         for dir in datadirs:
             for file in os.listdir(dir):
@@ -33,17 +36,21 @@ class Dataset(data.Dataset):
 
         #code.interact(local=dict(globals(), **locals()))
         #self.labels = [label_dict[path[6:]] for path in self.paths]#for acl dataset
-        self.labels = [label_dict[path.split("/")[-1]] for path in self.paths]
-
+        #self.labels = [label_dict[path.split("/")[-1]] for path in self.paths]#for binary classification
+        self.labels = np.asarray([np.eye(3)[label_dict[path.split("/")[-1]]] for path in self.paths])#for multi classification
+        #code.interact(local=dict(globals(), **locals()))                            
         neg_weight = np.mean(self.labels)
         self.weights = [neg_weight, 1 - neg_weight]
 
     def weighted_loss(self, prediction, target):
-        weights_npy = np.array([self.weights[int(t[0])] for t in target.data])
+        #code.interact(local=dict(globals(), **locals()))
+        #weights_npy = np.array([self.weights[int(t[0])] for t in target.data])#for binary classification
+        weights_npy = np.array([self.weights[int(t[0])] for t in target.data[0]])#for multi classification
         weights_tensor = torch.FloatTensor(weights_npy)
         if self.use_gpu:
             weights_tensor = weights_tensor.cuda()
-        loss = F.binary_cross_entropy_with_logits(prediction, target, weight=Variable(weights_tensor))
+        #loss = F.binary_cross_entropy_with_logits(prediction, target, weight=Variable(weights_tensor))#for binary classification
+        loss = F.binary_cross_entropy_with_logits(prediction, target[0], weight=Variable(weights_tensor))#for multi classification
         return loss
 
     def __getitem__(self, index):
