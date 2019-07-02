@@ -19,7 +19,7 @@ class Dataset(data.Dataset):
 
         label_dict = {}
         self.paths = []
-        for i, line in enumerate(open('metadata.csv').readlines()):
+        for i, line in enumerate(open('metadata_shoulder.csv').readlines()):
             if i == 0:
                 continue
             line = line.strip().split(',')
@@ -31,7 +31,9 @@ class Dataset(data.Dataset):
             for file in os.listdir(dir):
                 self.paths.append(dir+'/'+file)
 
-        self.labels = [label_dict[path[6:]] for path in self.paths]
+        #code.interact(local=dict(globals(), **locals()))
+        #self.labels = [label_dict[path[6:]] for path in self.paths]#for acl dataset
+        self.labels = [label_dict[path.split("/")[-1]] for path in self.paths]
 
         neg_weight = np.mean(self.labels)
         self.weights = [neg_weight, 1 - neg_weight]
@@ -71,9 +73,9 @@ class Dataset(data.Dataset):
         return len(self.paths)
 
 def load_data(diagnosis, use_gpu=False):
-    train_dirs = ['vol08','vol04','vol03','vol09','vol06','vol07']
-    valid_dirs = ['vol10','vol05']
-    test_dirs = ['vol01','vol02']
+    train_dirs = ['./shoulder_dataset/train']
+    valid_dirs = ['./shoulder_dataset/validation']
+    test_dirs = ['./shoulder_dataset/test']
        
     train_dataset = Dataset(train_dirs, diagnosis, use_gpu)
     valid_dataset = Dataset(valid_dirs, diagnosis, use_gpu)
